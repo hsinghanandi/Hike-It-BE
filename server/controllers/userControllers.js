@@ -6,23 +6,24 @@ require('dotenv').config();
 const getAllUsers = (req, res) => {
     const query = userModel.find({});
 
-    if (Object.keys(query).length) {
-        res.status(500).json({
-            status: 'ERROR',
-            message: 'No users exists!',
-        });
-    } else {
-        query
-            .select('name _id') //  get all users with their username and ID
-            .exec()
-            .then((results) => {
-                console.log('Getting all Users : ', results);
-
-                // send user data based upon results
-                // res.status(200).json({});
-            })
-            .catch((error) => res.status(500).json({ error: error }));
-    }
+    query
+        .exec()
+        .then((results) => {
+            console.log('Getting all Users : ', results);
+            {
+                results && results.length
+                    ? res.status(200).json({
+                          status: 'SUCCESS',
+                          message: 'Sending all users details!',
+                          data: results,
+                      })
+                    : res.status(500).json({
+                          status: 'ERROR',
+                          message: 'No users exists!',
+                      });
+            }
+        })
+        .catch((error) => res.status(500).json({ error: error }));
 };
 
 const getUserLogin = async (req, res) => {
@@ -41,9 +42,6 @@ const getUserLogin = async (req, res) => {
             { id: user._id, username: user.username },
             process.env.JWT_SECRET
         );
-
-        // SEND USER DATA AFTER SUCCESSFUL SIGNING IN!
-        // AS IN PROFILE, FAV HIKES, ETC.
 
         return res.json({
             status: 'SUCCESS',
@@ -74,7 +72,6 @@ const createUser = async (req, res) => {
             .then((result) => {
                 console.log('USER CREATED WITH FOLLOWING DETAILS:', result);
 
-                // send user data based upon results
                 res.status(201).json({
                     status: 'SUCCESS',
                     message: 'USER CREATED SUCCESSFULLY!',

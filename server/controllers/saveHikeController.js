@@ -6,11 +6,18 @@ const getAllHikes = (req, res) => {
     query
         .exec()
         .then((results) => {
-            res.status(200).json({
-                status: 'SUCCESS',
-                message: 'Getting all Saved Hikes!',
-                data: results,
-            });
+            {
+                results && results.length
+                    ? res.status(200).json({
+                          status: 'SUCCESS',
+                          message: 'Sending all saved Hikes!',
+                          data: results,
+                      })
+                    : res.status(500).json({
+                          status: 'ERROR',
+                          message: 'No saved hikes!',
+                      });
+            }
         })
         .catch((error) => res.status(500).json({ error: error }));
 };
